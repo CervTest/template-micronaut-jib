@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: jibby
+  annotations:
+    jenkins.io/job-full-name: CervTest/jibby
+spec:
+  type: service
+  lifecycle: experimental
+  owner: team-c
