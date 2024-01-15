@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
 kind: Template
 metadata:
-  name: template-micronaut-jib
+  name: template-micronaut-jib2
   title: Micronaut with Jib
   description: Develop a Micronaut-based application while letting Jib (by Google) handle containerization
 spec:
