@@ -2,6 +2,8 @@
 
 A [Micronaut](micronaut.io) + [Jib](https://github.com/GoogleContainerTools/jib) mashup with extra bells and whistles for showing some hot CI/CD action.
 
+To run and see the application in action execute `./gradlew run` then look at http://localhost:8080/hello for a simple message
+
 You can try out the basic tutorial at https://codelabs.developers.google.com/codelabs/cloud-micronaut-kubernetes to see a similar but dated approach.
 
 ## Behind the scenes
@@ -52,5 +54,3 @@ The `mykey` parameter becomes the json file written to disk in the active direct
 - [Micronaut Gradle Plugin documentation](https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/)
 - [GraalVM Gradle Plugin documentation](https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html)
 - [Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#httpClient)
-
-
