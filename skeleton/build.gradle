@@ -54,7 +54,7 @@ task runDocker(type: Exec) {
 jib {
     //from.image = 'adoptopenjdk:11-jre-hotspot'
 
-    // This needs auth via `gcloud auth configure-docker` locally or something else in CI. Hardcoded GCP project name.
+    // This needs auth via `gcloud auth configure-docker` locally or something else in CI
     to.image = "$imagePath"
     // `./gradlew jib` will then both build and publish the image
 

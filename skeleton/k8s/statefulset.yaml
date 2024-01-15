@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: jibby
+  name: ${{ values.crumb }}
 spec:
-  serviceName: jibby
+  serviceName: ${{ values.crumb }}
   selector:
     matchLabels:
-      app: jibby
+      app: ${{ values.crumb }}
   template:
     metadata:
       labels:
-        app: jibby
+        app: ${{ values.crumb }}
     spec:
       containers:
-        - name: jibby
+        - name: ${{ values.crumb }}
           image: IMAGE_PATH
           ports:
             - containerPort: 8080

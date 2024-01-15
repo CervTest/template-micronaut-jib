@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.crumb }}
+  annotations:
+    jenkins.io/job-full-name: Experimental/CervTest/${{ values.crumb }}
+spec:
+  type: service
+  lifecycle: experimental
+  owner: ${{ values.owner }}

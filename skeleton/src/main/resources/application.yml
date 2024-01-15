@@ -1,6 +1,6 @@
 micronaut:
   application:
-    name: jibby
+    name: ${{ values.crumb }}
 netty:
   default:
     allocator:

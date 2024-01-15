@@ -1,4 +1,4 @@
-# Jibby
+# ${{ values.name }}
 
 A [Micronaut](micronaut.io) + [Jib](https://github.com/GoogleContainerTools/jib) mashup with extra bells and whistles for showing some hot CI/CD action.
 
@@ -38,7 +38,7 @@ To get a credential to work with GCR you need to make a [service account](https:
 
 After you have a suitable service account you need a JSON file representing the key and its details to use within Jenkins (or elsewhere). This can be created in the UI or via CLI, example used for this repo:
 
-`gcloud iam service-accounts keys create mykey --iam-account=gcr-service-user@proto-client-ttf-832500.iam.gserviceaccount.com`
+`gcloud iam service-accounts keys create mykey --iam-account=gcr-service-user@${{ values.gcpProject }}.iam.gserviceaccount.com`
 
 The `mykey` parameter becomes the json file written to disk in the active directory. Submit it as a Secret File credential in Jenkins and it'll be usable as within the `Jenkinsfile` in this repo, referred to by its credential id `gcr-service-user-proto-client-ttf`
 
