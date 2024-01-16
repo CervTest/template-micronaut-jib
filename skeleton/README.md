@@ -2,7 +2,7 @@
 
 A [Micronaut](micronaut.io) + [Jib](https://github.com/GoogleContainerTools/jib) mashup with extra bells and whistles for showing some hot CI/CD action.
 
-To run and see the application in action execute `./gradlew run` then look at http://localhost:8080/hello for a simple message
+To run and see the application in action execute `./gradlew run` then look at http://localhost:8080/hello for a simple message. If deployed to Kubernetes with the initial deployment setup the app should be available at https://${{ values.crumb }}.${{ values.domain }}/hello
 
 You can try out the basic tutorial at https://codelabs.developers.google.com/codelabs/cloud-micronaut-kubernetes to see a similar but dated approach.
 

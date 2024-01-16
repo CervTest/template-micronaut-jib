@@ -38,6 +38,7 @@ pipeline {
                     sh 'kubectl get ns'
                     sh 'kubectl create ns ${{ values.crumb }} || true' // Don't break if namespace already exists
                     sh 'kubectl apply -f k8s/ -n ${{ values.crumb }}'
+                    echo "Deployment complete, site should be available shortly at https://${{ values.crumb }}.${{ values.domain }}/hello"
                 }
             }
         }

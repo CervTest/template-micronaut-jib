@@ -4,6 +4,10 @@ metadata:
   name: ${{ values.crumb }}
   annotations:
     jenkins.io/job-full-name: Experimental/CervTest/${{ values.crumb }}
+  links:
+    - url: https://${{ values.crumb }}.{{ values.domain }}/hello
+      title: Initial Environment
+      icon: dashboard
 spec:
   type: service
   lifecycle: experimental
