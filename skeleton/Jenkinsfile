@@ -29,8 +29,8 @@ pipeline {
         
         stage('SonarQube') {
             steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    sh './gradlew sonarqube -Dsonar.token=$SONAR_TOKEN'
+                withCredentials([string(credentialsId: 'sonar-api-token-admin-user', variable: 'SONAR_TOKEN')]) {
+                    sh './gradlew sonar'
                 }
             }
         }
@@ -47,7 +47,7 @@ pipeline {
 
         stage('k8s deploy') {
             agent {
-                label 'kubectl' // Use an agent with the "kubectl" label
+                label 'kubectl'
             }
             steps {
                 // On the special agent, unstash the 'k8s' directory

@@ -82,8 +82,8 @@ task prepareCD(type: Exec) {
 
 sonar {
   properties {
-    property "sonar.projectKey", "com.example.${crumb}"
-      property "sonar.host.url", "https://sonarqube.terasology.io/"
+        property "sonar.projectKey", "com.example.${applicationName}"
+        property "sonar.host.url", "https://sonarqube.terasology.io/"
         property "sonar.token", System.getenv('SONAR_TOKEN')
     }
 }
