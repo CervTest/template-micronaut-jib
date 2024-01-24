@@ -1,6 +1,7 @@
 plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("io.micronaut.application") version "3.7.10"
+    id("org.sonarqube") version "4.4.1.3373"
 
     id 'com.google.cloud.tools.jib' version '3.4.0'
 }
@@ -8,7 +9,8 @@ plugins {
 group = "com.example"
 
 ext {
-    imagePath = "gcr.io/${gcpProjectName}/${applicationName}:${version}"
+    //imagePath = "gcr.io/${gcpProjectName}/${applicationName}:${version}"
+    imagePath = "docker.terasology.io/repository/docker-nexus/${applicationName}:${version}"
 }
 
 repositories {
@@ -54,11 +56,18 @@ task runDocker(type: Exec) {
 jib {
     //from.image = 'adoptopenjdk:11-jre-hotspot'
 
-    // This needs auth via `gcloud auth configure-docker` locally or something else in CI
-    to.image = "$imagePath"
+    // This needs auth via `gcloud auth configure-docker` locally or something else in CI. Hardcoded GCP project name.
+    //to.image = "$imagePath"
     // `./gradlew jib` will then both build and publish the image
 
-    // TODO: Nexus publishing target variant URL & auth
+    // Alternative with Nexus auth
+    to {
+        image = "$imagePath"
+        auth {
+            username = System.getenv('NEXUS_USERNAME') ?: 'unset'
+            password = System.getenv('NEXUS_PASSWORD') ?: 'unset'
+        }
+    }
     // Interesting part will be templates with _dynamic_ pick of container registry based on Venue setup
 }
 
@@ -69,4 +78,12 @@ task prepareCD(type: Exec) {
         sed -i 's|APP_URL|${appUrl}|g' k8s/ingress.yaml &&
         sed -i 's|IMAGE_PATH|${imagePath}|g' k8s/statefulset.yaml
     """
+}
+
+sonar {
+  properties {
+    property "sonar.projectKey", "com.example.${crumb}"
+      property "sonar.host.url", "https://sonarqube.terasology.io/"
+        property "sonar.token", System.getenv('SONAR_TOKEN')
+    }
 }

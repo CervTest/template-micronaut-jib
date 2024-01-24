@@ -4,6 +4,8 @@ metadata:
   name: ${{ values.crumb }}
   annotations:
     jenkins.io/job-full-name: Experimental/CervTest/${{ values.crumb }}
+    sonarqube.org/project-key: com.example.${{ values.crumb }}
+    nexus-repository-manager/docker.image-name: repository/docker-nexus/${{ values.crumb }}
   links:
     - url: https://${{ values.crumb }}.${{ values.domain }}/hello
       title: Initial Environment

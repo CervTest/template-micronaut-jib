@@ -18,6 +18,6 @@ public class HelloController {
     @Produces(MediaType.TEXT_PLAIN)
     @Get("/")
     public String index() {
-        return "Hello Kubernetes World - now on Micronaut v3 and in Java, huzzah! And extra Docker goodness plus env specifics: "  + myConfig.getAppName();
+        return "Hello Kubernetes World - now on Micronaut v3 and in Java, huzzah! Here's your app name including optional environment toggle: "  + myConfig.getAppName();
     }
 }
