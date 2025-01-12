@@ -40,7 +40,15 @@ After you have a suitable service account you need a JSON file representing the 
 
 `gcloud iam service-accounts keys create mykey --iam-account=gcr-service-user@${{ values.gcpProject }}.iam.gserviceaccount.com`
 
-The `mykey` parameter becomes the json file written to disk in the active directory. Submit it as a Secret File credential in Jenkins and it'll be usable as within the `Jenkinsfile` in this repo, referred to by its credential id `gcr-service-user-proto-client-ttf`
+The `mykey` parameter becomes the json file written to disk in the active directory. Submit it as a Secret File credential in Jenkins and it'll be usable as within the `Jenkinsfile` in this repo, referred to by its credential id
+
+#### Google Artifact Registry
+
+This is much like GCR, with different values for the registry URL and the service account. The authentication takes a little more handling, see `build.gradle` for details
+
+#### Nexus Repository
+
+This is a more generic repository manager that can be used for many things, including Docker images. The setup is a bit more involved than GCR, but it is a good option for self-hosted solutions. Again see `build.gradle` for the exact setup there.
 
 ## Micronaut 3.10.1 Documentation
 

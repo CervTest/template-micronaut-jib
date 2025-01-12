@@ -9,8 +9,9 @@ plugins {
 group = "com.example"
 
 ext {
-    //imagePath = "gcr.io/${gcpProjectName}/${applicationName}:${version}"
-    imagePath = "docker.terasology.io/repository/docker-nexus/${applicationName}:${version}"
+    //imagePath = "gcr.io/${gcpProjectName}/${applicationName}:${version}"                                  // GCR
+    //imagePath = "docker.terasology.io/repository/docker-nexus/${applicationName}:${version}"              // Nexus
+    imagePath = "us-east1-docker.pkg.dev/${gcpProjectName}/test-docker/${applicationName}:${version}"       // GAR
 }
 
 repositories {
@@ -60,15 +61,38 @@ jib {
     //to.image = "$imagePath"
     // `./gradlew jib` will then both build and publish the image
 
-    // Alternative with Nexus auth
+    // Alternatives with auth
     to {
         image = "$imagePath"
+
+        // GAR auth - assumes the service account key is in a secret file credential from Jenkins
+        auth {
+            username = "_json_key"
+            password = project.provider({ -> // This Gradle file may be executed in a context where Jenkins credentials are not available yet
+                def garKeyFile = System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+                if (garKeyFile == null) {
+                    logger.warn("Warning: GOOGLE_APPLICATION_CREDENTIALS env var is not set. Skipping Jib authentication.")
+                    return ""
+                }
+
+                def keyFile = new File(garKeyFile as String)
+                if (!keyFile.exists()) {
+                    logger.warn("Warning: Service account key file does not exist: ${keyFile.absolutePath}. Skipping Jib authentication.")
+                    return ""
+                }
+
+                return keyFile.text
+            })
+        }
+
+        /* Nexus way
         auth {
             username = System.getenv('NEXUS_USERNAME') ?: 'unset'
             password = System.getenv('NEXUS_PASSWORD') ?: 'unset'
         }
+        */
     }
-    // Interesting part will be templates with _dynamic_ pick of container registry based on Venue setup
+    // Interesting part could be templates with _dynamic_ pick of container registry
 }
 
 // Does text manipulation to prepare k8s YAML files for deployment - should happen in a CD style context with no Git updates
@@ -81,7 +105,7 @@ task prepareCD(type: Exec) {
 }
 
 sonar {
-  properties {
+    properties {
         property "sonar.projectKey", "com.example.${applicationName}"
         property "sonar.host.url", "https://sonarqube.terasology.io/"
         property "sonar.token", System.getenv('SONAR_TOKEN')

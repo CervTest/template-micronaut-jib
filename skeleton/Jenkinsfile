@@ -14,19 +14,24 @@ pipeline {
 
         stage('Containerize') {
             steps {
-                // Nexus auth for jib, build.gradle is pointed explicitly to the Nexus env vars to find them
-                withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD' )]){
-                    // Build & publish image with a valid credential set
-                    sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
-                }
-
-                // GCR alternative to create and publish a Docker image using Jib with GCR auth present (magic env var)
-                //withCredentials([file(credentialsId: 'gcr-service-user-proto-client-ttf', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                // Nexus auth for jib, build.gradle should be pointed explicitly to the Nexus env vars to find them
+                //withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD' )]){
+                // Build & publish image with a valid credential set
                 //    sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
                 //}
+
+                // GCR alternative to create and publish a Docker image using Jib with GCR auth present (magic env var)
+                //withCredentials([file(credentialsId: 'jenkins-gcr-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                //    sh './gradlew --console=plain jib' // Jib outputs some gibberish progress logging we skip with "plain"
+                //}
+
+                // Prepare GAR credentials for Jib - takes a bit extra handling in the Gradle file
+                withCredentials([file(credentialsId: 'jenkins-gar-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    sh "./gradlew --console=plain jib" // Jib outputs some gibberish progress logging we skip with "plain"
+                }
             }
         }
-        
+        /* Disabled until Sonar available
         stage('SonarQube') {
             steps {
                 withCredentials([string(credentialsId: 'sonar-api-token-admin-user', variable: 'SONAR_TOKEN')]) {
@@ -34,32 +39,34 @@ pipeline {
                 }
             }
         }
-
+        */
         stage('Prep CD') {
             steps {
                 // Customize Kubernetes manifests for deployment
                 sh './gradlew prepareCD'
 
-                // Stash the modified 'k8s' directory so we can use it in the next stage
+                // Stash the modified 'k8s' directory so we can use it in the next stage (on a new agent)
                 stash includes: 'k8s/**', name: 'k8s-stash'
             }
         }
 
         stage('k8s deploy') {
             agent {
-                label 'kubectl'
+                label 'kubectl' // We swap from the Java build agent to a Kubernetes agent for deployment
             }
             steps {
-                // On the special agent, unstash the 'k8s' directory
+                // Unstash the 'k8s' directory on the new agent
                 unstash 'k8s-stash'
                 sh 'ls -la k8s'
 
-                // Deploy to Kubernetes
-                withKubeConfig(clusterName: 'ttf-cluster', contextName: 'jenkins-k8s', credentialsId: '1c00907c-98ab-4c55-bd44-7afc075d4ac8', namespace: '', restrictKubeConfigAccess: false, serverUrl: 'https://kubernetes.default') {
-                    sh 'kubectl get ns'
-                    sh 'kubectl create ns ${{ values.crumb }} || true' // Don't break if namespace already exists
-                    sh 'kubectl apply -f k8s/ -n ${{ values.crumb }}'
-                    echo "Deployment complete, site should be available shortly at https://${{ values.crumb }}.${{ values.domain }}/hello"
+                // Deploy to Kubernetes - this build agent uses a secondary container for kubectl
+                container("utility") {
+                    withKubeConfig(credentialsId: 'utility-admin-kubeconfig-sa-token') {
+                        sh 'kubectl get ns'
+                        sh 'kubectl create ns ${{ values.crumb }} || true' // Don't break if namespace already exists
+                        sh 'kubectl apply -f k8s/ -n ${{ values.crumb }}'
+                        echo "Deployment complete, site should be available shortly at https://${{ values.crumb }}.${{ values.domain }}/hello"
+                    }
                 }
             }
         }

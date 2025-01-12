@@ -43,7 +43,7 @@ spec:
           title: GCP Project
           type: string
           description: Target GCP project to deploy to
-          default: proto-client-ttf-832500
+          default: teralivekubernetes
         crumb:
           title: Crumb
           type: string
